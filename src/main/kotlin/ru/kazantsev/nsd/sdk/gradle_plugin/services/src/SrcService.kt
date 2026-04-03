@@ -1,9 +1,9 @@
 package ru.kazantsev.nsd.sdk.gradle_plugin.services.src
 
 import org.gradle.api.Project
-import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcCodesDto
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcDtoRoot
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcFileDto
+import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcInfo
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcInfoRoot
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.nsd_connector.SdkApiConnector
 
@@ -45,13 +45,6 @@ class SrcService(private val project: Project) {
     }
 
     /**
-     * Сравнивает удалённые и локальные метаданные исходников.
-     */
-    fun compareSrcInfo(remoteSrcInfo: SrcInfoRoot, localSrcInfo: SrcInfoRoot): SrcInfoRoot {
-        return srcChecksumService.compareSrcInfo(remoteSrcInfo, localSrcInfo)
-    }
-
-    /**
      * Получает checksum'и с сервера и сравнивает их с локальным хранилищем.
      */
     fun compareRemoteSrcInfoWithLocal(
@@ -63,7 +56,7 @@ class SrcService(private val project: Project) {
         val effectiveModules = modules.ifEmpty { srcFoldersService.modules.getAllSourceFiles().map { it.code } }
         val remoteSrcInfo = getRemoteSrcInfo(connector, effectiveScripts, effectiveModules)
         val localSrcInfo = srcStorageService.readLocalSrcInfo(scripts, modules)
-        return compareSrcInfo(remoteSrcInfo, localSrcInfo)
+        return srcChecksumService.compareSrcInfo(remoteSrcInfo, localSrcInfo)
     }
 
     /**
@@ -94,7 +87,7 @@ class SrcService(private val project: Project) {
             val remoteSrcInfo = getRemoteSrcInfo(connector, requestedScriptCodes, requestedModuleCodes)
             val localSrcInfo = srcStorageService.readLocalSrcInfo(requestedScriptCodes, requestedModuleCodes)
             if (localSrcInfo.scripts.isNotEmpty() || localSrcInfo.modules.isNotEmpty()) {
-                val diff = srcChecksumService.compareAvailableSrcInfo(remoteSrcInfo, localSrcInfo)
+                val diff = srcChecksumService.compareSrcInfo(remoteSrcInfo, localSrcInfo)
                 if (diff.scripts.isNotEmpty() || diff.modules.isNotEmpty()) {
                     throw IllegalStateException(
                         buildString {
@@ -120,9 +113,15 @@ class SrcService(private val project: Project) {
             srcFoldersService.scripts,
             srcFoldersService.modules
         )
-        val pushedInfo = srcArchiveService.pushChecksumsToInfoRoot(connector.pushScripts(srcArchive))
-        srcStorageService.updateInfoFile(pushedInfo.scripts, pushedInfo.modules)
-
+        val pushedSourcesInfo = connector.pushScripts(srcArchive)
+        val pushedInfo = SrcInfoRoot(
+            scripts = pushedSourcesInfo.scripts.map { SrcInfo(it.checksum, it.code) }.toMutableList(),
+            modules = pushedSourcesInfo.modules.map { SrcInfo(it.checksum, it.code) }.toMutableList()
+        )
+        srcStorageService.updateInfoFile(
+            pushedInfo.scripts,
+            pushedInfo.modules
+        )
         return pushedInfo
     }
 

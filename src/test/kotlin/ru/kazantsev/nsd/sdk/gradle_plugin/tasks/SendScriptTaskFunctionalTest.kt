@@ -3,6 +3,7 @@ package ru.kazantsev.nsd.sdk.gradle_plugin.tasks
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import ru.kazantsev.nsd.sdk.gradle_plugin.PluginFunctionalTestBase
+import ru.kazantsev.nsd.sdk.gradle_plugin.tasks.remote.SendScriptTask
 import java.nio.file.Files
 
 class SendScriptTaskFunctionalTest : PluginFunctionalTestBase() {
@@ -36,6 +37,6 @@ class SendScriptTaskFunctionalTest : PluginFunctionalTestBase() {
             *remoteServerArgs()
         ).build()
 
-        assertTrue(result.output.contains("NSD SCRIPT RESULT"))
+        assertTrue(result.output.contains(SendScriptTask.RESULT_START))
     }
 }

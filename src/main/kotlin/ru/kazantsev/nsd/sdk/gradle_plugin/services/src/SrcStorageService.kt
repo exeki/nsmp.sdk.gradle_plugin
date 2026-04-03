@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import org.gradle.api.Project
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcInfo
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcInfoRoot
+import ru.kazantsev.nsd.sdk.gradle_plugin.services.Utilities
 import java.io.File
 
 /**
@@ -16,7 +17,6 @@ class SrcStorageService(private val project: Project) {
     companion object {
         private const val SDK_DIR_PATH = ".smp_sdk"
         private const val INFO_FILE_NAME = "src_info.json"
-        private val OBJECT_MAPPER = ObjectMapper().findAndRegisterModules()
     }
 
     private val infoFilePath: File
@@ -40,15 +40,15 @@ class SrcStorageService(private val project: Project) {
             return SrcInfoRoot()
         }
 
-        val srcInfo = OBJECT_MAPPER.readValue(infoFilePath, SrcInfoRoot::class.java)
+        val srcInfo = Utilities.objectMapper.readValue(infoFilePath, SrcInfoRoot::class.java)
         if (scriptsFilter.isEmpty() && modulesFilter.isEmpty()) {
             return srcInfo
         }
 
-        return SrcInfoRoot().apply {
-            scripts.addAll(srcInfo.scripts.filter { scriptsFilter.isEmpty() || it.code in scriptsFilter })
-            modules.addAll(srcInfo.modules.filter { modulesFilter.isEmpty() || it.code in modulesFilter })
-        }
+        return SrcInfoRoot(
+            scripts = srcInfo.scripts.filter { scriptsFilter.isEmpty() || it.code in scriptsFilter },
+            modules = srcInfo.modules.filter { modulesFilter.isEmpty() || it.code in modulesFilter }
+        )
     }
 
     /**
@@ -62,21 +62,21 @@ class SrcStorageService(private val project: Project) {
         }
 
         val rootObject = if (currentInfoFile.readText().isBlank()) {
-            OBJECT_MAPPER.createObjectNode()
+            Utilities.objectMapper.createObjectNode()
         } else {
-            OBJECT_MAPPER.readTree(currentInfoFile) as ObjectNode
+            Utilities.objectMapper.readTree(currentInfoFile) as ObjectNode
         }
 
-        val updatedRoot = OBJECT_MAPPER.createObjectNode().apply {
+        val updatedRoot = Utilities.objectMapper.createObjectNode().apply {
             set<ArrayNode>("scripts", mergeEntries(rootObject.get("scripts"), scripts))
             set<ArrayNode>("modules", mergeEntries(rootObject.get("modules"), modules))
         }
 
-        OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(currentInfoFile, updatedRoot)
+        Utilities.objectMapper.writerWithDefaultPrettyPrinter().writeValue(currentInfoFile, updatedRoot)
     }
 
     private fun mergeEntries(existingEntries: JsonNode?, incomingEntries: List<SrcInfo>): ArrayNode {
-        val result = OBJECT_MAPPER.createArrayNode()
+        val result = Utilities.objectMapper.createArrayNode()
         val byCode = linkedMapOf<String, JsonNode>()
 
         existingEntries?.forEach { element ->
@@ -85,7 +85,7 @@ class SrcStorageService(private val project: Project) {
         }
 
         incomingEntries.forEach { info ->
-            byCode[info.code] = OBJECT_MAPPER.valueToTree(info)
+            byCode[info.code] = Utilities.objectMapper.valueToTree(info)
         }
 
         byCode.values.forEach { result.add(it) }

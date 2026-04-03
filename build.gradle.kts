@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.kazantsev.nsd.sdk"
-version = "2.0.8"
+version = "2.0.9"
 
 kotlin {
     jvmToolchain(21)

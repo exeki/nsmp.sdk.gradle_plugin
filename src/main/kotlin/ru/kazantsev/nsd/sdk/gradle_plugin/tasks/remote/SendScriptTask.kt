@@ -10,6 +10,8 @@ abstract class SendScriptTask : RemoteNsdTask() {
 
     companion object {
         const val NAME = "send_script"
+        const val RESULT_START = "------------SMP SCRIPT RESULT------------"
+        const val RESULT_END = "-----------------------------------------"
     }
 
     @get:Input
@@ -25,9 +27,9 @@ abstract class SendScriptTask : RemoteNsdTask() {
         val file = File(project.projectDir, filePath.get())
         val message: String? = createConnector().execFile(file)
         if (message != null) {
-            println("------------SMP SCRIPT RESULT------------")
+            println(RESULT_START)
             println(message)
-            println("-----------------------------------------")
+            println(RESULT_END)
         }
     }
 }

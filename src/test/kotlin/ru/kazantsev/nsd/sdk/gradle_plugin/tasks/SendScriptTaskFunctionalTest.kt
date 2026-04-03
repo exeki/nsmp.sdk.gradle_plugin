@@ -26,9 +26,10 @@ class SendScriptTaskFunctionalTest : PluginFunctionalTestBase() {
     fun sendsConsoleScriptToRemoteServer() {
         writeConsumerProject()
         Files.createDirectories(testProjectDir.resolve("scripts"))
+        val testString = "super useless test"
         Files.writeString(
             testProjectDir.resolve("scripts/sendScript.groovy"),
-            "return \"test\""
+            "return \"$testString\""
         )
 
         val result = runner(
@@ -38,5 +39,6 @@ class SendScriptTaskFunctionalTest : PluginFunctionalTestBase() {
         ).build()
 
         assertTrue(result.output.contains(SendScriptTask.RESULT_START))
+        assertTrue(result.output.contains(testString))
     }
 }

@@ -12,8 +12,4 @@ class SrcInfo {
      * Код исходника
      */
     val code: String = ""
-    /**
-     * Тип исходника
-     */
-    val type : SrcType = SrcType.MODULE
 }

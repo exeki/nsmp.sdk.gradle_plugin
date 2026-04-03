@@ -17,7 +17,7 @@ abstract class SendScriptTask : RemoteNsdTask() {
     abstract val filePath: Property<String>
 
     init {
-        description = "Sends the configured console script to NSD"
+        description = "Sends the configured script to SMP"
     }
 
     @TaskAction
@@ -25,7 +25,7 @@ abstract class SendScriptTask : RemoteNsdTask() {
         val file = File(project.projectDir, filePath.get())
         val message: String? = createConnector().execFile(file)
         if (message != null) {
-            println("------------NSD SCRIPT RESULT------------")
+            println("------------SMP SCRIPT RESULT------------")
             println(message)
             println("-----------------------------------------")
         }

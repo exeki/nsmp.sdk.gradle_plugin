@@ -8,14 +8,33 @@ import java.nio.file.Files
 class FetchSrcTaskFunctionalTest : PluginFunctionalTestBase() {
 
     @Test
-    fun createsScriptFileInScriptsSourceRoot() {
+    fun createsScriptFileInScriptsSourceRootWithCliConnection() {
         writeConsumerProject()
 
         runner(
             "fetch_src",
-            "--scripts", "testScript1",
-            "--modules", "testModule1",
+            "--scripts=testScript1",
+            "--modules=testModule1",
             *remoteServerArgs()
+        ).build()
+
+        assertTrue(Files.exists(testProjectDir.resolve("src/main/scripts/ru/kazantsev/demo/testScript1.groovy")))
+    }
+
+    @Test
+    fun createsScriptFileInScriptsSourceRootFromBuildScriptConfiguration() {
+        writeConsumerProject(
+            """
+            smpSdk {
+                setInstallation( "$TEST_INSTALLATION_ID")
+            }
+            """.trimIndent()
+        )
+
+        runner(
+            "fetch_src",
+            "--scripts=testScript1",
+            "--modules=testModule1"
         ).build()
 
         assertTrue(Files.exists(testProjectDir.resolve("src/main/scripts/ru/kazantsev/demo/testScript1.groovy")))

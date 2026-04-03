@@ -14,6 +14,7 @@ class PluginFunctionalTest : PluginFunctionalTestBase() {
         assertTrue(result.output.contains("create_console_file"))
         assertTrue(result.output.contains("fetch_src"))
         assertTrue(result.output.contains("check_src"))
+        assertTrue(result.output.contains("push_src"))
         assertTrue(result.output.contains("send_script"))
     }
 

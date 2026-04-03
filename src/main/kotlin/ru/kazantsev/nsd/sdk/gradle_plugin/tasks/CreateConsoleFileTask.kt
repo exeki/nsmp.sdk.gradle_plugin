@@ -4,7 +4,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
-import ru.kazantsev.nsd.sdk.gradle_plugin.services.SourceSetsService
+import ru.kazantsev.nsd.sdk.gradle_plugin.services.src.SrcFoldersService
 
 abstract class CreateConsoleFileTask : DefaultTask() {
     companion object {
@@ -15,12 +15,12 @@ abstract class CreateConsoleFileTask : DefaultTask() {
     abstract val consoleFilePath: Property<String>
 
     init {
-        group = "nsd_sdk_local"
+        group = "smp_sdk_local"
         description = "Creates the console script file and supporting source directories"
     }
 
     @TaskAction
     fun action() {
-        SourceSetsService(project).createConsoleFile(consoleFilePath.get())
+        SrcFoldersService(project).createConsoleFile(consoleFilePath.get())
     }
 }

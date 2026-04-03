@@ -7,10 +7,14 @@ plugins {
 }
 
 group = "ru.kazantsev.nsd.sdk"
-version = "2.0.0"
+version = "2.0.8"
 
 kotlin {
     jvmToolchain(21)
+}
+
+java {
+    withSourcesJar()
 }
 
 repositories {
@@ -37,14 +41,6 @@ gradlePlugin {
 
 tasks {
 
-    javadoc {
-        dependsOn(dokkaJavadoc)
-    }
-
-    dokkaJavadoc {
-        outputDirectory.set(layout.buildDirectory.dir("docs/javadoc"))
-    }
-
     compileJava {
         targetCompatibility = JavaVersion.VERSION_21.majorVersion
         sourceCompatibility = JavaVersion.VERSION_21.majorVersion
@@ -58,16 +54,6 @@ tasks {
         useJUnitPlatform()
     }
 
-    register<Jar>("javadocJar") {
-        from(getByName("javadoc").outputs.files)
-        archiveClassifier.set("javadoc")
-    }
-
-    register<Jar>("sourcesJar") {
-        from(sourceSets.main.get().allSource)
-        archiveClassifier.set("sources")
-    }
-
 }
 
 publishing {
@@ -78,6 +64,7 @@ publishing {
             version = project.version.toString()
 
             from(components["kotlin"])
+            artifact(tasks.named("sourcesJar"))
         }
     }
 
@@ -94,7 +81,7 @@ publishing {
 }
 
 dependencies {
-    implementation("ru.kazantsev.nsd:basic_api_connector:1.5.0")
+    implementation("ru.kazantsev.nsd:basic_api_connector:1.5.2")
     testImplementation(gradleTestKit())
     testImplementation(kotlin("test"))
 }

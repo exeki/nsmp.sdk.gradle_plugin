@@ -50,8 +50,8 @@ class CheckSrcTaskFunctionalTest : PluginFunctionalTestBase() {
 
         val result = runner(
             "check_src",
-            "--scripts", "testScript1",
-            "--modules", "testModule1",
+            "--scripts=testScript1",
+            "--modules=testModule1",
             *remoteServerArgs()
         ).build()
 

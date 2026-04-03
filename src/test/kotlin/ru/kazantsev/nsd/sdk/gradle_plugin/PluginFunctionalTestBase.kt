@@ -29,6 +29,22 @@ abstract class PluginFunctionalTestBase {
     }
 
     protected fun writeConsumerProject() {
+        writeConsumerProject(
+            """
+            smpSdk {
+                setInstallation(
+                    "$TEST_INSTALLATION_ID",
+                    "$TEST_SCHEME",
+                    "$TEST_HOST",
+                    "$TEST_ACCESS_KEY",
+                    $IGNORE_SSL
+                )
+            }
+            """.trimIndent()
+        )
+    }
+
+    protected fun writeConsumerProject(sdkConfiguration: String) {
         Files.writeString(
             testProjectDir.resolve("settings.gradle.kts"),
             """
@@ -42,6 +58,8 @@ abstract class PluginFunctionalTestBase {
             plugins {
                 id("nsd_sdk")
             }
+
+            $sdkConfiguration
 
             tasks.register("printImplementationDeps") {
                 doLast {

@@ -42,3 +42,6 @@ bin/
 .DS_Store
 /.kotlin/
 /.idea/
+/src/test/resources/plugin-playground/build/reports/problems/
+/src/test/resources/plugin-playground/.idea/
+/src/test/resources/plugin-playground/lib/

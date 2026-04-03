@@ -1,16 +1,17 @@
 package ru.kazantsev.nsd.sdk.gradle_plugin.client.nsd_connector
 
-
 import org.apache.hc.core5.http.ContentType
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity
 import org.apache.hc.core5.http.io.entity.EntityUtils
 import org.apache.hc.core5.http.io.entity.StringEntity
 import ru.kazantsev.nsd.basic_api_connector.Connector
 import ru.kazantsev.nsd.basic_api_connector.ConnectorParams
+import ru.kazantsev.nsd.basic_api_connector.NsdDto
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.meta.MetaClassWrapperDto
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcInfoRoot
 
 /**
- * РљРѕРЅРЅРµРєС‚РѕСЂ Рє NSD
+ * Коннектор к NSD.
  */
 class SdkApiConnector(params: ConnectorParams) : Connector(params) {
 
@@ -18,9 +19,10 @@ class SdkApiConnector(params: ConnectorParams) : Connector(params) {
     private val paramsConst: String = "request,response,user"
 
     /**
-     * РџРѕР»СѓС‡РёС‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РјРµС‚Р°РєР»Р°СЃСЃРµ
-     * @param metaClassCode РєРѕРґ РјРµС‚Р°РєР»Р°СЃСЃР°, РёРЅС„Р° РїРѕ РєРѕС‚РѕСЂРѕРјСѓ РЅСѓР¶РЅР°
-     * @return dto СЃ РёРЅС„РѕСЂРјР°С†РёРµР№
+     * Получает информацию о метаклассе.
+     *
+     * @param metaClassCode код метакласса, информация по которому нужна
+     * @return DTO с информацией
      */
     fun getMetaClassInfo(metaClassCode: String): MetaClassWrapperDto {
         val methodName = "getMetaClassInfo"

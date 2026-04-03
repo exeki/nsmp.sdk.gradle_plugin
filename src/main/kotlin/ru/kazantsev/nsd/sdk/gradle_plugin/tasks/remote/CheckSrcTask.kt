@@ -1,10 +1,12 @@
 package ru.kazantsev.nsd.sdk.gradle_plugin.tasks.remote
 
-import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
-import ru.kazantsev.nsd.sdk.gradle_plugin.services.SrcService
+import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcCodesDto
+import ru.kazantsev.nsd.sdk.gradle_plugin.services.src.SrcService
 
 abstract class CheckSrcTask : RemoteNsdTask() {
 
@@ -13,24 +15,29 @@ abstract class CheckSrcTask : RemoteNsdTask() {
     }
 
     @get:Input
-    @get:Option(option = "scripts", description = "Script codes to check")
-    abstract val scripts: ListProperty<String>
+    @get:Optional
+    @get:Option(option = "scripts", description = "Script codes to check (optional)")
+    abstract val scripts: Property<String>
 
     @get:Input
-    @get:Option(option = "modules", description = "Module codes to check")
-    abstract val modules: ListProperty<String>
+    @get:Optional
+    @get:Option(option = "modules", description = "Module codes to check  ")
+    abstract val modules: Property<String>
 
     init {
-        description = "Checks remote src info against local checksums"
+        description = "Checks remote src checksums against local checksums. Use --scripts and --modules, for example: --scripts=a,b --modules=c,d"
     }
 
     @TaskAction
     fun action() {
+        val requestedScripts = parseCsvOption(scripts.orNull)
+        val requestedModules = parseCsvOption(modules.orNull)
         val srcService = SrcService(project)
+
         val diff = srcService.compareRemoteSrcInfoWithLocal(
-            createConnectorParams(),
-            scripts.getOrElse(emptyList()),
-            modules.getOrElse(emptyList())
+            createConnector(),
+            requestedScripts,
+            requestedModules
         )
 
         if (diff.scripts.isEmpty() && diff.modules.isEmpty()) {

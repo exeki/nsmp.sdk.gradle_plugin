@@ -3,6 +3,9 @@ package ru.kazantsev.nsd.sdk.gradle_plugin.services
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 
+/**
+ * Сервис, который добавляет в проект репозитории и dev-зависимости, нужные плагину.
+ */
 class DependencyService(private val project: Project) {
 
     companion object {
@@ -17,14 +20,15 @@ class DependencyService(private val project: Project) {
     private val repositoryUsername: String? = System.getenv("GITHUB_USERNAME")
     private val repositoryPassword: String? = System.getenv("GITHUB_TOKEN")
 
+    /**
+     * Добавляет в проект репозиторий GitHub Packages, если его ещё нет.
+     */
     fun addRepositoriesToProject() {
         val repositoryUri = project.uri(REPOSITORY_URI)
         val existingRepository = project.repositories
             .withType(MavenArtifactRepository::class.java)
             .find { it.url == repositoryUri }
-        if (existingRepository != null) {
-            return
-        }
+        if (existingRepository != null) return
 
         project.repositories.maven {
             it.url = repositoryUri
@@ -35,6 +39,9 @@ class DependencyService(private val project: Project) {
         }
     }
 
+    /**
+     * Добавляет в проект зависимости, которые нужны для работы с NSD в режиме разработки.
+     */
     fun addDevDependenciesToProject() {
         val implementation = project.configurations.findByName("implementation") ?: return
         DEV_DEPENDENCY_IDS.forEach {

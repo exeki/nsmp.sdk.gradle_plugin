@@ -1,16 +1,23 @@
-package ru.kazantsev.nsd.sdk.gradle_plugin.tasks.remote
+﻿package ru.kazantsev.nsd.sdk.gradle_plugin.tasks.remote
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.options.Option
 import ru.kazantsev.nsd.basic_api_connector.Connector
 import ru.kazantsev.nsd.basic_api_connector.ConnectorParams
+import ru.kazantsev.nsd.sdk.gradle_plugin.client.nsd_connector.SdkApiConnector
 
 abstract class RemoteNsdTask : DefaultTask() {
 
+    @get:Internal
+    var connectorParamsProvider: Provider<ConnectorParams>? = null
+
     @get:Input
+    @get:Optional
     @get:Option(option = "inst", description = "NSD installation identifier")
     abstract val installationId: Property<String>
 
@@ -48,17 +55,43 @@ abstract class RemoteNsdTask : DefaultTask() {
                 scheme.get(),
                 host.get(),
                 accessKey.get(),
-                if (ignoreSsl.isPresent) ignoreSsl.get() else false
+                ignoreSsl.orNull ?: false
             )
-        } else ConnectorParams.byConfigFile(installationId.get())
+        } else if (installationId.isPresent) {
+            ConnectorParams.byConfigFile(installationId.get())
+        } else {
+            throw IllegalStateException("SMP installation identifier is not configured")
+        }
     }
 
+    protected fun createConnector(): SdkApiConnector {
+        return SdkApiConnector(resolveConnectorParams())
+    }
 
-    protected fun createConnector(): Connector {
-        return Connector(createConnectorParams())
+    protected fun resolveConnectorParams(): ConnectorParams {
+        return if (installationId.isPresent) createConnectorParams()
+        else connectorParamsProvider?.orNull
+            ?: throw IllegalStateException("SMP connection parameters are not configured")
+    }
+
+    protected fun requireRequestedSources(scripts: List<String>, modules: List<String>) {
+        if (scripts.isEmpty() && modules.isEmpty()) {
+            throw IllegalArgumentException(
+                "At least one of scripts or modules must be specified. " +
+                        "Use --scripts=a,b and/or --modules=c,d"
+            )
+        }
+    }
+
+    protected fun parseCsvOption(value: String?): List<String> {
+        return value
+            .orEmpty()
+            .split(',')
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
     }
 
     init {
-        group = "nsd_sdk_remote"
+        group = "smp_sdk_remote"
     }
 }

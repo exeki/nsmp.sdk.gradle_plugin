@@ -3,7 +3,6 @@ package ru.kazantsev.nsd.sdk.gradle_plugin
 import ru.kazantsev.nsd.basic_api_connector.ConnectorParams
 
 open class Extension {
-
     internal var sendFilePath: String? = null
     internal var installation: Installation? = null
 
@@ -37,39 +36,44 @@ open class Extension {
 }
 
 abstract class Installation {
-    var connectorParams: ConnectorParams
-
+    abstract val installationId: String
+    abstract val connectorParams: ConnectorParams
     abstract fun createConnectorParams(): ConnectorParams
-
-    init {
-        connectorParams = createConnectorParams()
-    }
 }
 
-internal  class InstallationByConfigFile(
-    val installationId: String
+internal class InstallationByConfigFile(
+    override val installationId: String
 ) : Installation() {
+    override val connectorParams: ConnectorParams
+        get() = createConnectorParams()
+
     override fun createConnectorParams(): ConnectorParams {
         return ConnectorParams.byConfigFile(installationId)
     }
 }
 
-internal  class InstallationByConfigFileInPath(
-    val installationId: String,
+internal class InstallationByConfigFileInPath(
+    override val installationId: String,
     val pathToConfigFile: String
 ) : Installation() {
+    override val connectorParams: ConnectorParams
+        get() = createConnectorParams()
+
     override fun createConnectorParams(): ConnectorParams {
         return ConnectorParams.byConfigFileInPath(installationId, pathToConfigFile)
     }
 }
 
-internal  class InstallationDirect(
-    val installationId: String,
+internal class InstallationDirect(
+    override val installationId: String,
     val scheme: String,
     val host: String,
     val accessKey: String,
     val ignoreSsl: Boolean
 ) : Installation() {
+    override val connectorParams: ConnectorParams
+        get() = createConnectorParams()
+
     override fun createConnectorParams(): ConnectorParams {
         return ConnectorParams(
             installationId,

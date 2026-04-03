@@ -1,4 +1,4 @@
-<config save-log="true" threads-number="1">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../target/classes/advimport/schema1.xsd" save-log="true" threads-number="1">
 	<mode>CREATE</mode>
 	<mode>UPDATE</mode>
 	<gui-parameter name="fileCI" type="FILE" title="Выберите файл (CSV)"/>

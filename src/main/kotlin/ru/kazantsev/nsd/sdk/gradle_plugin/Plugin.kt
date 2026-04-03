@@ -80,6 +80,7 @@ private fun <T : RemoteNsdTask> TaskProvider<T>.configureRemote(
     additional: T.() -> Unit = {}
 ): TaskProvider<T> {
     configure {
+        it.doNotTrackState("This task must always run")
         it.connectorParamsProvider = providers.provider { extension.installation?.connectorParams }
         it.additional()
     }

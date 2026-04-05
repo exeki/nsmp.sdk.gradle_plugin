@@ -33,7 +33,7 @@ abstract class FetchSrcTask : RemoteNsdTask() {
         val requestedModules = parseCsvOption(modules.orNull)
         requireRequestedSources(requestedScripts, requestedModules)
 
-        val srcService = SrcService(project)
+        val srcService = SrcService(project.projectDir.toPath())
         srcService.fetchAndStore(
             createConnector(),
             requestedScripts,

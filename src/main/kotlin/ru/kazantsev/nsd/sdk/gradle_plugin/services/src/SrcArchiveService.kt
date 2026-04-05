@@ -1,8 +1,5 @@
 package ru.kazantsev.nsd.sdk.gradle_plugin.services.src
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.gradle.api.Project
-import ru.kazantsev.nsd.basic_api_connector.NsdDto
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcFileDto
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcDto
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcDtoRoot
@@ -18,12 +15,10 @@ import java.util.zip.ZipOutputStream
 /**
  * Сервис для работы с архивом `src`: упаковка, распаковка и преобразование checksum-ответа.
  */
-class SrcArchiveService(private val project: Project) {
+class SrcArchiveService {
     companion object {
         private const val SRC_PUSH_ARCHIVE_ROOT = "src/main/groovy/ru/naumen"
     }
-
-    private val logger = project.logger
 
     /**
      * Собирает zip-архив из локальных source root.
@@ -55,7 +50,6 @@ class SrcArchiveService(private val project: Project) {
         ZipInputStream(ByteArrayInputStream(srcArchive)).use { zis ->
             var entry: ZipEntry? = zis.nextEntry
             while (entry != null) {
-                logger.lifecycle("Src archive entry: {}", entry.name)
                 if (entry.isDirectory) {
                     entry = zis.nextEntry
                     continue

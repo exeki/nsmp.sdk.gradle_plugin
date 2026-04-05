@@ -3,6 +3,8 @@ package ru.kazantsev.nsd.sdk.gradle_plugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskProvider
 import ru.kazantsev.nsd.sdk.gradle_plugin.services.DependencyService
 import ru.kazantsev.nsd.sdk.gradle_plugin.services.src.SrcFoldersService
@@ -24,12 +26,12 @@ class Plugin : Plugin<Project> {
 
         val extension = project.extensions.create("smpSdk", Extension::class.java)
         val providers = project.providers
-        val srcFoldersService = SrcFoldersService(project)
+        val srcFoldersService = SrcFoldersService(project.projectDir.toPath())
         val dependencyService = DependencyService(project)
 
         dependencyService.addRepositoriesToProject()
         dependencyService.addDevDependenciesToProject()
-        srcFoldersService.configureSourceSets()
+        configureSourceSets(project, srcFoldersService)
 
         project.tasks.register(
             CreateConsoleFileTask.NAME,
@@ -72,6 +74,12 @@ class Plugin : Plugin<Project> {
             force.convention(false)
         }
     }
+}
+
+private fun configureSourceSets(project: Project, srcFoldersService: SrcFoldersService) {
+    val sourceSetContainer = project.extensions.getByType(SourceSetContainer::class.java)
+    val main = sourceSetContainer.maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME)
+    srcFoldersService.roots.forEach { main.java.srcDir(it.getRelativePath()) }
 }
 
 private fun <T : RemoteNsdTask> TaskProvider<T>.configureRemote(

@@ -32,7 +32,7 @@ abstract class CheckSrcTask : RemoteNsdTask() {
     fun action() {
         val requestedScripts = parseCsvOption(scripts.orNull)
         val requestedModules = parseCsvOption(modules.orNull)
-        val srcService = SrcService(project)
+        val srcService = SrcService(project.projectDir.toPath())
 
         val diff = srcService.compareRemoteSrcInfoWithLocal(
             createConnector(),

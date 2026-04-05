@@ -1,37 +1,29 @@
 package ru.kazantsev.nsd.sdk.gradle_plugin.services.src
 
-import org.gradle.api.Project
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcDtoRoot
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcFileDto
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcInfo
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcInfoRoot
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.nsd_connector.SdkApiConnector
+import java.nio.file.Path
 
 /**
  * Сервис, который оркестрирует работу с исходниками NSD.
  */
-class SrcService(private val project: Project) {
-
-
-    private val logger = project.logger
-    val srcFoldersService = SrcFoldersService(project)
-    val srcStorageService = SrcStorageService(project)
-    val srcArchiveService = SrcArchiveService(project)
+class SrcService(private val projectRootPath: Path) {
+    val srcFoldersService = SrcFoldersService(projectRootPath)
+    val srcStorageService = SrcStorageService(projectRootPath)
+    val srcArchiveService = SrcArchiveService()
     val srcChecksumService = SrcChecksumService()
 
     /**
-     * Загружает исходникии с сервера и сохраняет их в локальные source sets.
+     * Загружает исходники с сервера и сохраняет их в локальные source sets.
      */
     fun fetchAndStore(connector: SdkApiConnector, scripts: List<String>, modules: List<String>): SrcDtoRoot {
-        logger.lifecycle("Fetching src: scripts={}, modules={}", scripts.size, modules.size)
         val srcArchive = connector.getSrc(scripts, modules)
-        logger.lifecycle("Unpacking src archive")
         val srcRoot = srcArchiveService.unpackSrcArchive(srcArchive)
-        logger.lifecycle("Writing {} scripts to {}", srcRoot.scripts.size, srcFoldersService.scripts.getPath())
         srcRoot.scripts.forEach { srcFoldersService.scripts.writeSourceFile(it) }
-        logger.lifecycle("Writing {} modules to {}", srcRoot.modules.size, srcFoldersService.modules.getPath())
         srcRoot.modules.forEach { srcFoldersService.modules.writeSourceFile(it) }
-        logger.lifecycle("Updating {}", srcStorageService.getInfoFile())
         srcStorageService.updateInfoFile(srcRoot.scripts.map { it.info }, srcRoot.modules.map { it.info })
         return srcRoot
     }
@@ -40,7 +32,6 @@ class SrcService(private val project: Project) {
      * Получает с сервера актуальную информацию о checksum'ах исходников.
      */
     fun getRemoteSrcInfo(connector: SdkApiConnector, scripts: List<String>, modules: List<String>): SrcInfoRoot {
-        logger.lifecycle("Fetching src info: scripts={}, modules={}", scripts.size, modules.size)
         return connector.getSrcInfo(scripts, modules)
     }
 
@@ -101,12 +92,6 @@ class SrcService(private val project: Project) {
             }
         }
 
-        logger.lifecycle(
-            "Pushing src: scripts={}, modules={}, force={}",
-            requestedScripts.size,
-            requestedModules.size,
-            force
-        )
         val srcArchive = srcArchiveService.buildSrcArchive(
             requestedScripts,
             requestedModules,
@@ -124,5 +109,4 @@ class SrcService(private val project: Project) {
         )
         return pushedInfo
     }
-
 }

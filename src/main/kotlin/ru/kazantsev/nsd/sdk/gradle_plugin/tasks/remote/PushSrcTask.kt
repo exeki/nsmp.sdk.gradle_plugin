@@ -34,7 +34,7 @@ abstract class PushSrcTask : RemoteNsdTask() {
 
     @TaskAction
     fun action() {
-        val srcService = SrcService(project)
+        val srcService = SrcService(project.projectDir.toPath())
         srcService.pushAndStore(
             createConnector(),
             parseCsvOption(scripts.orNull),

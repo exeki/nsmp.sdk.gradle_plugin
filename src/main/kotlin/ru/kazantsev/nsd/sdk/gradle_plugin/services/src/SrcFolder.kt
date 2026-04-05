@@ -1,16 +1,16 @@
 package ru.kazantsev.nsd.sdk.gradle_plugin.services.src
 
-import org.gradle.api.Project
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcDto
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcFileDto
 import java.io.File
+import java.nio.file.Path
 
 /**
- * Описывает один source set проекта и операции c ним
+ * Описывает один source set проекта и операции с ним.
  */
 class SrcFolder(
-    private val project: Project,
-    private val path: String
+    private val projectRootPath: Path,
+    private val relativePath: String
 ) {
 
     companion object {
@@ -42,26 +42,24 @@ class SrcFolder(
      * Возвращает абсолютный путь к source root.
      */
     fun getPath(): File {
-        return project.file(path)
+        return projectRootPath.resolve(relativePath).toFile()
     }
 
     /**
-     * Возвращает путь source root относительно проекта
+     * Возвращает путь source root относительно проекта.
      */
     fun getRelativePath(): String {
-        return path
+        return relativePath
     }
 
     /**
-     * Найти файлы исходников по кодам в source set (независимо от вложенности по папкам)
+     * Найти файлы исходников по кодам в source set (независимо от вложенности по папкам).
      * @param srcCodes список кодов исходников
      */
     fun findSourceFiles(srcCodes: List<String>): List<SrcFileDto> {
-        val allFiles = project.fileTree(getPath()).files
+        val allFiles = getPath().walkTopDown().filter { it.isFile }.toList()
         return srcCodes.map { srcCode ->
-            val matches = allFiles.filter {
-                it.isFile && it.name == "$srcCode.groovy"
-            }
+            val matches = allFiles.filter { it.name == "$srcCode.groovy" }
 
             val file = when (matches.size) {
                 0 -> throw IllegalStateException("Source file $srcCode not found in ${getPath()}")
@@ -74,15 +72,16 @@ class SrcFolder(
     }
 
     /**
-     * Получить все файлы исходников из папки
+     * Получить все файлы исходников из папки.
      */
     fun getAllSourceFiles(): List<SrcFileDto> {
         val rootDirectory = getPath()
         if (!exists()) return emptyList()
 
-        val groovyFiles = project.fileTree(path).files
+        val groovyFiles = rootDirectory.walkTopDown()
             .filter { it.isFile && it.name.endsWith(".groovy") }
             .sortedBy { rootDirectory.toPath().relativize(it.toPath()).toString() }
+            .toList()
 
         val groupedByCode = groovyFiles.groupBy { it.name.substringBeforeLast(".groovy") }
         val duplicatedCodes = groupedByCode.filterValues { it.size > 1 }.keys
@@ -96,8 +95,8 @@ class SrcFolder(
     }
 
     /**
-     * Записать новый файл исходника
-     * @param src - ДТО файла
+     * Записать новый файл исходника.
+     * @param src ДТО файла
      */
     fun writeSourceFile(src: SrcDto) {
         val packageDirectory = resolvePackageDirectory(src.text)
@@ -106,11 +105,11 @@ class SrcFolder(
     }
 
     /**
-     * Определить package исходника, что бы сохранить его в корректной папке
+     * Определить package исходника, чтобы сохранить его в корректной папке.
      * @param sourceText текст файла, там будем искать package
      */
     private fun resolvePackageDirectory(sourceText: String): File {
-        if (path.contains("src\\main\\resources")) return create()
+        if (relativePath.contains("src\\main\\resources")) return create()
         val packageName = PACKAGE_DECLARATION_REGEX.find(sourceText)?.groupValues?.get(1) ?: return create()
         return create().resolve(packageName.replace('.', File.separatorChar)).apply { mkdirs() }
     }

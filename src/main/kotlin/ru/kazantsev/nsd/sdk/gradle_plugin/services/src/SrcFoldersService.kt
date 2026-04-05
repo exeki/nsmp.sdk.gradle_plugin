@@ -1,19 +1,16 @@
 package ru.kazantsev.nsd.sdk.gradle_plugin.services.src
 
-import org.gradle.api.Project
-import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.SourceSetContainer
 import java.io.FileWriter
+import java.nio.file.Path
 
 /**
  * Сервис, который описывает и создаёт стандартные source root плагина.
  */
-class SrcFoldersService(private val project: Project) {
+class SrcFoldersService(private val projectRootPath: Path) {
     companion object {
-
         const val SCRIPT_SOURCE_SET_PATH: String = "src\\main\\scripts"
-        private const val GROOVY_SOURCE_SET_PATH: String = "src\\main\\groovy"
-        private const val MODULES_SOURCE_SET_PATH: String = "src\\main\\modules"
+        const val GROOVY_SOURCE_SET_PATH: String = "src\\main\\groovy"
+        const val MODULES_SOURCE_SET_PATH: String = "src\\main\\modules"
 
         private val PACKAGE_FOLDERS: Set<String> = setOf(
             "attrFiltration",
@@ -41,19 +38,10 @@ class SrcFoldersService(private val project: Project) {
         """.trimIndent()
     }
 
-    val groovy = SrcFolder(project, GROOVY_SOURCE_SET_PATH)
-    val modules = SrcFolder(project, MODULES_SOURCE_SET_PATH)
-    val scripts = SrcFolder(project, SCRIPT_SOURCE_SET_PATH)
+    val groovy = SrcFolder(projectRootPath, GROOVY_SOURCE_SET_PATH)
+    val modules = SrcFolder(projectRootPath, MODULES_SOURCE_SET_PATH)
+    val scripts = SrcFolder(projectRootPath, SCRIPT_SOURCE_SET_PATH)
     val roots: Set<SrcFolder> = setOf(groovy, modules, scripts)
-
-    /**
-     * Регистрирует source root в Gradle source sets.
-     */
-    fun configureSourceSets() {
-        val sourceSetContainer = project.extensions.getByType(SourceSetContainer::class.java)
-        val main = sourceSetContainer.maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME)
-        roots.forEach { main.java.srcDir(it.getRelativePath()) }
-    }
 
     /**
      * Создаёт базовую структуру каталогов плагина и console-скрипт.
@@ -70,7 +58,7 @@ class SrcFoldersService(private val project: Project) {
     fun createScriptPackageFolders() {
         scripts.create()
         PACKAGE_FOLDERS.forEach {
-            project.file("$SCRIPT_SOURCE_SET_PATH/$it").mkdirs()
+            projectRootPath.resolve(SCRIPT_SOURCE_SET_PATH).resolve(it).toFile().mkdirs()
         }
     }
 
@@ -78,7 +66,7 @@ class SrcFoldersService(private val project: Project) {
      * Создаёт console-файл, если он ещё не существует.
      */
     fun createConsoleFile(consoleFilePath: String) {
-        val consoleFile = project.file(consoleFilePath)
+        val consoleFile = projectRootPath.resolve(consoleFilePath).toFile()
         if (!consoleFile.exists()) {
             val parent = consoleFile.parentFile
             if (!parent.exists()) parent.mkdirs()

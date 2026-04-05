@@ -1,26 +1,25 @@
 package ru.kazantsev.nsd.sdk.gradle_plugin.services.src
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
-import org.gradle.api.Project
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcInfo
 import ru.kazantsev.nsd.sdk.gradle_plugin.client.dto.src.SrcInfoRoot
 import ru.kazantsev.nsd.sdk.gradle_plugin.services.Utilities
 import java.io.File
+import java.nio.file.Path
 
 /**
  * Сервис для локального хранилища метаданных `src` в `.smp_sdk/src_info.json`.
  */
-class SrcStorageService(private val project: Project) {
+class SrcStorageService(private val projectRootPath: Path) {
     companion object {
         private const val SDK_DIR_PATH = ".smp_sdk"
         private const val INFO_FILE_NAME = "src_info.json"
     }
 
     private val infoFilePath: File
-        get() = project.file("$SDK_DIR_PATH/$INFO_FILE_NAME")
+        get() = projectRootPath.resolve(SDK_DIR_PATH).resolve(INFO_FILE_NAME).toFile()
 
     /**
      * Возвращает файл локального хранилища метаданных.
@@ -55,7 +54,7 @@ class SrcStorageService(private val project: Project) {
      * Обновляет локальный файл метаданных, объединяя старые и новые записи по коду.
      */
     fun updateInfoFile(scripts: List<SrcInfo>, modules: List<SrcInfo>) {
-        val sdkDir = project.file(SDK_DIR_PATH).apply { mkdirs() }
+        val sdkDir = projectRootPath.resolve(SDK_DIR_PATH).toFile().apply { mkdirs() }
         val currentInfoFile = sdkDir.resolve(INFO_FILE_NAME)
         if (!currentInfoFile.exists()) {
             currentInfoFile.createNewFile()

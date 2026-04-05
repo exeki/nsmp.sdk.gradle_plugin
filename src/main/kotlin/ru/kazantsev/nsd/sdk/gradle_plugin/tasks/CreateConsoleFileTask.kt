@@ -21,6 +21,6 @@ abstract class CreateConsoleFileTask : DefaultTask() {
 
     @TaskAction
     fun action() {
-        SrcFoldersService(project).createConsoleFile(consoleFilePath.get())
+        SrcFoldersService(project.projectDir.toPath()).createConsoleFile(consoleFilePath.get())
     }
 }

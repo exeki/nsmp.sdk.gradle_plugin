@@ -1,4 +1,4 @@
-rootProject.name = "gradle_plugin"
+rootProject.name = "nsmp_sdk_gradle_plugin"
 pluginManagement {
     repositories {
         maven {

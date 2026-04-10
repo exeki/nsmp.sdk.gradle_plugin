@@ -23,7 +23,8 @@ class DependencyService(private val project: Project) {
      * Добавляет в проект репозиторий GitHub Packages, если его ещё нет.
      */
     fun addRepositoriesToProject() {
-        val repositoryUri =project.uri(REPOSITORY_URI)
+        if (repositoryUsername == null || repositoryPassword == null) return
+        val repositoryUri = project.uri(REPOSITORY_URI)
         val existingRepository = project.repositories
             .withType(MavenArtifactRepository::class.java)
             .find { it.url == repositoryUri }
@@ -31,10 +32,8 @@ class DependencyService(private val project: Project) {
 
         project.repositories.maven {
             it.url = repositoryUri
-            if (repositoryUsername != null) {
-                it.credentials.username = repositoryUsername
-                it.credentials.password = repositoryPassword
-            }
+            it.credentials.username = repositoryUsername
+            it.credentials.password = repositoryPassword
         }
     }
 
@@ -42,6 +41,7 @@ class DependencyService(private val project: Project) {
      * Добавляет в проект зависимости, которые нужны для работы с NSD в режиме разработки.
      */
     fun addDependenciesToProject() {
+        if (repositoryUsername == null || repositoryPassword == null) return
         val implementation = project.configurations.findByName("implementation") ?: return
         DEV_DEPENDENCY_IDS.forEach {
             val alreadyAdded = implementation.dependencies.any { dependency ->

@@ -25,7 +25,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build docs, sources and publish
-        run: ./gradlew clean build dokkaHtml publish
+        run: ./gradlew publish
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

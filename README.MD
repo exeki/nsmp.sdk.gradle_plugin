@@ -9,7 +9,7 @@
 
 Плагин автоматически подключает:
 1. Мой GitHub репозиторий для зависимостей: https://maven.pkg.github.com/exeki/*
-   **Данное подключение трубует указания глобальных переменных GITHUB_USERNAME и GITHUB_TOKEN.**
+   **Данное подключение требует указания глобальных переменных GITHUB_USERNAME и GITHUB_TOKEN.**
 2. Библиотеку [nsd.sdk.global_variables](https://github.com/exeki/nsd.sdk.global_variables) - используется как плейсхолдер API системы, полезна для написания скриптов
 
 ### Автоматическое создания структуры каталогов в проекте
@@ -23,12 +23,12 @@
 3. Перезагрузите ПК, что бы переменные инициализировались.
 4. Для использования SDK рекомендуется использовать в качестве базы сгенерированный Intellij IDEA проект с параметрами:
 - Language - groovy
-- Build system - gradle (тест функционала с maven не проводился)
-- JDK - Amazon Corretto 11 (думаю подойдет любая 11 версия)
+- Build system - gradle 
+- JDK - 21 
 - Groovy SDK - 4.*
 - Gradle DSL - kotlin
   Как использовать SDK в другой IDE я не знаю, тк пользуюсь только Intellij IDEA, но gradle - это универсальный инструмент, и в теории не должно быть проблемой запустить SDK в любой другой IDE, которая будет поддержавать gradle.
-  Если у вас есть подобный опыт и выхотите им поделится - пишите мне, размещу информацию тут.
+  Если у вас есть подобный опыт и вы хотите им поделится - пишите мне, размещу информацию тут.
 5. В вашем проекте подключите мой репозиторий в ключ pluginManagement.repositories в файл settings.gradle.kts:
 ```settings.gradle.kts
 rootProject.name = "random_scripts"
@@ -48,7 +48,7 @@ pluginManagement {
 6. Подключите плагин в файле build.gradle.kts вашего проекта:
 ```build.gradle.kts
 plugins {
-    id("nsmp_sdk") version "2.1.0"
+    id("nsmp_sdk") version "2.2.0"
 }
 ```
 

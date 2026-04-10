@@ -1,4 +1,4 @@
-package ru.kazantsev.nsd.sdk.gradle_plugin.services
+package ru.kazantsev.nsmp.sdk.gradle_plugin.services
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
@@ -12,7 +12,6 @@ class DependencyService(private val project: Project) {
         private const val REPOSITORY_URI = "https://maven.pkg.github.com/exeki/*"
 
         private val DEV_DEPENDENCY_IDS = setOf(
-            "ru.kazantsev.nsd:json_rpc_connector:1.+",
             "ru.kazantsev.nsd.sdk:global_variables:1.+"
         )
     }
@@ -24,7 +23,7 @@ class DependencyService(private val project: Project) {
      * Добавляет в проект репозиторий GitHub Packages, если его ещё нет.
      */
     fun addRepositoriesToProject() {
-        val repositoryUri = project.uri(REPOSITORY_URI)
+        val repositoryUri =project.uri(REPOSITORY_URI)
         val existingRepository = project.repositories
             .withType(MavenArtifactRepository::class.java)
             .find { it.url == repositoryUri }
@@ -42,15 +41,13 @@ class DependencyService(private val project: Project) {
     /**
      * Добавляет в проект зависимости, которые нужны для работы с NSD в режиме разработки.
      */
-    fun addDevDependenciesToProject() {
+    fun addDependenciesToProject() {
         val implementation = project.configurations.findByName("implementation") ?: return
         DEV_DEPENDENCY_IDS.forEach {
             val alreadyAdded = implementation.dependencies.any { dependency ->
                 "${dependency.group}:${dependency.name}:${dependency.version}" == it
             }
-            if (!alreadyAdded) {
-                project.dependencies.add(implementation.name, it)
-            }
+            if (!alreadyAdded) project.dependencies.add(implementation.name, it)
         }
     }
 }

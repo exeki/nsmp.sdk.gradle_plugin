@@ -50,17 +50,6 @@ tasks {
         compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
     }
 
-    withType<PublishToMavenRepository>().configureEach {
-        doFirst {
-            require(!githubUsername.orNull.isNullOrBlank()) {
-                "GITHUB_USERNAME is required for publishing to GitHub Packages"
-            }
-            require(!githubToken.orNull.isNullOrBlank()) {
-                "GITHUB_TOKEN is required for publishing to GitHub Packages"
-            }
-        }
-    }
-
     test {
         useJUnitPlatform()
     }

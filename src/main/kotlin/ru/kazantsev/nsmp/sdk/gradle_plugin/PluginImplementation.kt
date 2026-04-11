@@ -7,25 +7,17 @@ import org.gradle.api.tasks.SourceSetContainer
 import ru.kazantsev.nsmp.sdk.gradle_plugin.services.DependencyService
 import ru.kazantsev.nsmp.sdk.gradle_plugin.services.SrcFoldersService
 
-class Plugin : Plugin<Project> {
+class PluginImplementation : Plugin<Project> {
 
 
     override fun apply(project: Project) {
         project.pluginManager.apply("groovy")
-        val srcFoldersService = SrcFoldersService(project.projectDir.toPath())
+
+        val srcFoldersService = SrcFoldersService(project)
         val dependencyService = DependencyService(project)
 
         dependencyService.addRepositoriesToProject()
         dependencyService.addDependenciesToProject()
-        configureSourceSets(project, srcFoldersService)
-    }
-
-    private fun configureSourceSets(project: Project, srcFoldersService: SrcFoldersService) {
-        val sourceSetContainer = project.extensions.getByType(SourceSetContainer::class.java)
-        val main = sourceSetContainer.maybeCreate(SourceSet.MAIN_SOURCE_SET_NAME)
-        srcFoldersService.roots.forEach {
-            it.create()
-            main.java.srcDir(it.getRelativePath())
-        }
+        srcFoldersService.configureSourceSets()
     }
 }

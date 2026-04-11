@@ -17,10 +17,6 @@ kotlin {
     jvmToolchain(21)
 }
 
-java {
-    withSourcesJar()
-}
-
 repositories {
     mavenCentral()
     maven {
@@ -38,7 +34,7 @@ gradlePlugin {
             id = "nsmp_sdk"
             version = project.version
             group = project.group
-            implementationClass = "ru.kazantsev.nsmp.sdk.gradle_plugin.Plugin"
+            implementationClass = "ru.kazantsev.nsmp.sdk.gradle_plugin.PluginImplementation"
         }
     }
 }

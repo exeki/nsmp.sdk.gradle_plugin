@@ -10,6 +10,7 @@ plugins {
 group = "ru.kazantsev.nsmp.sdk"
 version = "2.2.3"
 
+
 val githubUsername: Provider<String?> = providers.environmentVariable("GITHUB_USERNAME")
 val githubToken: Provider<String?> = providers.environmentVariable("GITHUB_TOKEN")
 

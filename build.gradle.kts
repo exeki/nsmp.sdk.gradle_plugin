@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
 plugins {
     kotlin("jvm") version "2.1.0"
     id("maven-publish")
@@ -5,7 +8,10 @@ plugins {
 }
 
 group = "ru.kazantsev.nsmp.sdk"
-version = "2.2.1"
+version = "2.2.2"
+
+val githubUsername: Provider<String?> = providers.environmentVariable("GITHUB_USERNAME")
+val githubToken: Provider<String?> = providers.environmentVariable("GITHUB_TOKEN")
 
 kotlin {
     jvmToolchain(21)
@@ -20,8 +26,8 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/exeki/*")
         credentials {
-            username = System.getenv("GITHUB_USERNAME")
-            password = System.getenv("GITHUB_TOKEN")
+            username = githubUsername.orNull
+            password = githubToken.orNull
         }
     }
 }
@@ -44,8 +50,19 @@ tasks {
         sourceCompatibility = JavaVersion.VERSION_21.majorVersion
     }
 
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
-        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    withType<KotlinJvmCompile>().configureEach {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
+    }
+
+    withType<PublishToMavenRepository>().configureEach {
+        doFirst {
+            require(!githubUsername.orNull.isNullOrBlank()) {
+                "GITHUB_USERNAME is required for publishing to GitHub Packages"
+            }
+            require(!githubToken.orNull.isNullOrBlank()) {
+                "GITHUB_TOKEN is required for publishing to GitHub Packages"
+            }
+        }
     }
 
     test {
@@ -55,24 +72,13 @@ tasks {
 }
 
 publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
-
-            from(components["kotlin"])
-            artifact(tasks.named("sourcesJar"))
-        }
-    }
-
     repositories {
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/exeki/nsmp.sdk.gradle_plugin")
             credentials {
-                username = System.getenv("GITHUB_USERNAME")
-                password = System.getenv("GITHUB_TOKEN")
+                username = githubUsername.orNull
+                password = githubToken.orNull
             }
         }
     }

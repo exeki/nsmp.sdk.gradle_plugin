@@ -2,6 +2,9 @@ package ru.kazantsev.nsmp.sdk.gradle_plugin.services
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import ru.kazantsev.nsmp.sdk.gradle_plugin.Constants.Companion.DEV_DEPENDENCY_IDS
+import ru.kazantsev.nsmp.sdk.gradle_plugin.Constants.Companion.REPOSITORY_BASE_URI
+import ru.kazantsev.nsmp.sdk.gradle_plugin.Constants.Companion.REPOSITORY_URI
 import java.net.URI
 
 /**
@@ -10,13 +13,7 @@ import java.net.URI
 class DependencyService(private val project: Project) {
 
     companion object {
-        private const val REPOSITORY_BASE_URI = "https://maven.pkg.github.com/exeki"
-        private const val REPOSITORY_URI = "$REPOSITORY_BASE_URI/*"
 
-        private val DEV_DEPENDENCY_IDS = setOf(
-            "ru.kazantsev.nsd.sdk:global_variables:1.5.0",
-            "org.apache.groovy:groovy:4.0.14"
-        )
     }
 
     private data class ModuleId(val group: String, val name: String)

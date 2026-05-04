@@ -3,12 +3,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     kotlin("jvm") version "2.1.0"
+    kotlin("plugin.serialization") version "2.1.0"
     id("maven-publish")
     id("java-gradle-plugin")
 }
 
+val ktorVersion = "3.0.3"
+
 group = "ru.kazantsev.nsmp.sdk"
-version = "2.2.4"
+version = "2.3.4"
 
 
 val githubUsername: Provider<String?> = providers.environmentVariable("GITHUB_USERNAME")
@@ -71,6 +74,11 @@ publishing {
 }
 
 dependencies {
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-java:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+
     testImplementation(gradleTestKit())
     testImplementation(kotlin("test"))
 }

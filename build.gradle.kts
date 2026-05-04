@@ -11,7 +11,7 @@ plugins {
 val ktorVersion = "3.0.3"
 
 group = "ru.kazantsev.nsmp.sdk"
-version = "2.3.4"
+version = "2.3.5"
 
 
 val githubUsername: Provider<String?> = providers.environmentVariable("GITHUB_USERNAME")

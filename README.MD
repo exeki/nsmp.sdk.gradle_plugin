@@ -14,11 +14,11 @@
 4. Библиотеку groovy.
 5. Ищет сервер IntelliJ IDEA плагина `NSMP SDK` с целью получить конфигурацию для текущего плагина и последующего выполнения конфигурации source roots.
 
-**Пункты 2 и 3 требует указания глобальных переменных GITHUB_USERNAME и GITHUB_TOKEN, подробнее в разделе "Подключене"**.
+**Пункты 2 и 3 требует указания глобальных переменных GITHUB_LOGIN и GITHUB_TOKEN, подробнее в разделе "Подключене"**.
 
 # Подключение плагина
 
-1. Создайте переменную среды GITHUB_USERNAME на своем ПК для текущего пользователя. Укажите в ней почту, на которую у вас зарегистрирован аккаунт Github.
+1. Создайте переменную среды GITHUB_LOGIN на своем ПК для текущего пользователя. Укажите в ней почту, на которую у вас зарегистрирован аккаунт Github.
 2. Создайте переменную среды GITHUB_TOKEN на своем ПК для текущего пользователя. Укажите в ней персональный токен доступа. Рекомендуется использовать [fine-grained токен](https://github.com/settings/tokens?type=beta) со стандартными настройками, но должен подойти так же и [classic токен](https://github.com/settings/tokens).
 3. Переменные могут не сразу инициализироваться в терминале IDE. Обычно достаточно перезапустить процесс IDE.
 4. Для использования SDK рекомендуется использовать в качестве базы сгенерированный IntelliJ IDEA проект с параметрами:
@@ -37,7 +37,7 @@ pluginManagement {
         maven {
             url = uri("https://maven.pkg.github.com/exeki/*")
             credentials {
-                username = System.getenv("GITHUB_USERNAME")
+                username = System.getenv("GITHUB_LOGIN")
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
@@ -62,7 +62,7 @@ settingsEvaluated {
                 name = "exekiGithubRepo"
                 url = uri("https://maven.pkg.github.com/exeki/*")
                 credentials {
-                    username = System.getenv("GITHUB_USERNAME")
+                    username = System.getenv("GITHUB_LOGIN")
                     password = System.getenv("GITHUB_TOKEN")
                 }
             }

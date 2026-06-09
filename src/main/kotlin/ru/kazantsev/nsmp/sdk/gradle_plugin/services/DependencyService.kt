@@ -12,16 +12,20 @@ import java.net.URI
  */
 class DependencyService(private val project: Project) {
 
-    companion object {
-
-    }
 
     private data class ModuleId(val group: String, val name: String)
 
-    private val repositoryUsername: String? = System.getenv("GITHUB_USERNAME")
+    private val repositoryUsername: String?
+
     private val repositoryPassword: String? = System.getenv("GITHUB_TOKEN")
 
     private fun normalizeRepositoryUrl(uri: URI): String = uri.toString().trimEnd('/', '*')
+
+    init {
+        var username = System.getenv("GITHUB_USERNAME")
+        if (username.isNullOrBlank()) username = System.getenv("GITHUB_LOGIN")
+        repositoryUsername = username
+    }
 
     /**
      * Добавляет в проект репозиторий GitHub Packages, если его ещё нет.

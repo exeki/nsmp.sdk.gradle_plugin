@@ -49,7 +49,7 @@ pluginManagement {
 6. Подключите плагин в файле build.gradle.kts вашего проекта (не забудьте проверить актуальную версию в packages репозитория):
 ```build.gradle.kts
 plugins {
-    id("nsmp_sdk") version "2.3.4"
+    id("nsmp_sdk") version "2.3.7"
 }
 ```
 
@@ -82,7 +82,7 @@ settingsEvaluated {
 ```build.gradle.kts
 plugins {
     id("groovy")
-    id("nsmp_sdk") version "2.3.4"
+    id("nsmp_sdk") version "2.3.7"
 }
 
 nsmpSdk {

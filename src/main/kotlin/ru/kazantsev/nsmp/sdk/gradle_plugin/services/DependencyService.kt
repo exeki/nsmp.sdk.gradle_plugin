@@ -17,7 +17,7 @@ class DependencyService(private val project: Project) {
 
     private val repositoryUsername: String?
 
-    private val repositoryPassword: String? = System.getenv("GITHUB_TOKEN")
+    private val repositoryPassword: String?
 
     private fun normalizeRepositoryUrl(uri: URI): String = uri.toString().trimEnd('/', '*')
 
@@ -25,6 +25,10 @@ class DependencyService(private val project: Project) {
         var username = System.getenv("GITHUB_USERNAME")
         if (username.isNullOrBlank()) username = System.getenv("GITHUB_LOGIN")
         repositoryUsername = username
+
+        var token = System.getenv("GITHUB_PASSWORD")
+        if (token.isNullOrBlank()) token = System.getenv("GITHUB_TOKEN")
+        repositoryPassword = token
     }
 
     /**
